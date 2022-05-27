@@ -77,9 +77,16 @@ There are a number of ways to create a code chunk:
 - Inspired: Ctrl/Command + Alt/Option + I. *This is my preferred method.*
 
 1. Below, create a code chunk and name it `median_earnings`. Make sure there is an empty line above and below the code chunk.
+
 2. In your newly created R code chunk, verify that the median income for all majors was $36,000.
   - Specify that you want to use the `college_recent_grads` dataset, *then*, using the appropriate functions from `{dplyr}`, obtain the *median* summary statistic for the variable "median earnings of full-time, year-round workers" (this very wordy variable is simply `median` in the dataset).
   - In the appropriate *summarizing* step, refer to your numerical summary `median_earnings`.
+  
+```{r median_earnings} 
+college_recent_grads  %>%
+  summarize(median_earnings = median(median))
+```
+  
 
 ![](README-img/noun_pause.png) **Planned Pause Point**: If you have any questions, contact your instructor. Otherwise feel free to continue on.
 
@@ -91,6 +98,12 @@ Note that wWhen I obtain numerical summaries for variables, I like to include th
 1. Below, create a code chunk and name it `summary_earnings`. Make sure there is an empty line above and below the code chunk.
 2. Specify that you want to use the `college_recent_grads` dataset, *then*, using the appropriate functions from `{dplyr}`, obtain the sample size (i.e., *n*umber of observations), *mean*, *s*tandard *d*eviation, *min*imum, *median*, and *max*imum summaries for the variable "median earnings of full-time, year-round workers".
   - Be careful when you name your output summaries as we are dealing with things that could use the same name as functions that you will be using (i.e., "median").
+  
+```{r summary_earnings}
+college_recent_grads %>% 
+  summarise(n = n(), mean_earnings = mean (median), sd_earnings = sd(median), min_earnings = min(median), median_earnings = median(median), max_earnings = max(median))
+```
+  
 
 
 
@@ -100,7 +113,7 @@ DO NOT create any data visualizations here.
 Use your understanding of how these numerical summaries are related to the measures of center, spread, and potential shape.
 
 **Response**:
-
+There will be less observations at the end, $22k, and $110k and more observations around the median of $36k
 
 ### Median Earnings by Major Category
 
@@ -110,13 +123,22 @@ Now we will see how the different major categories compare to the overall distri
 1. Below, create a code chunk and name it `major_earnings`. Make sure there is an empty line above and below the code chunk.
 2. Specify that you want to use the `college_recent_grads` dataset, *then*, using the appropriate functions from `{dplyr}`, obtain the similar summaries of the variable "median earnings of full-time, year-round workers" as your `summary_earnings` code chunk, except now *by* each `major_category`.
 
+```{r major_earnings}
+
+college_recent_grads %>%
+  group_by(major_category) %>%
+  summarise(n = n(), mean_earnings = mean (median), sd_earnings = sd(median), min_earnings = min(median), median_earnings = median(median), max_earnings = max(median)) %>% 
+  arrange(desc(median_earnings)) %>% 
+  knitr::kable()
+```
+
 
 
 Is anything noteworthy when comparing your output from  `summary_earnings` to `major_earnings`?
 Also, compare your code in `summary_earnings` to `major_earnings`. 
 What is the same? Different?
 
-**Response**:
+**Response**: we can see that interdisciplinary studies has only 1 result and therefore no standard deviation
 
 
 Before we continue, knit your document and take note of what the output for your `major_earnings` code chunk looks like.
@@ -133,6 +155,8 @@ When would this `knitr::kable` code be useful?
 
 **Response**:
 
+it formatted the table! it's useful for publishing the results
+
 
 ![](README-img/noun_pause.png) **Planned Pause Point**: If you have any questions, contact your instructor. Otherwise feel free to continue on.
 
@@ -143,11 +167,18 @@ Let us see how well your descriptions in the [Median Earnings by Major Category]
 1. Below, create a code chunk and name it `major_boxplot`.
 2. Plot the distribution of the variable `median` earnings of full-time, year-round workers for each `major_category` using the *boxplot* and *jitter* geometries.
 
+```{r major_boxplot}
+ggplot(data = college_recent_grads, mapping = aes(y = median, x = major_category)) +
+  geom_boxplot() +
+  geom_jitter()
+
+```
+
 
 
 Provide a discussion on how your descriptions in the Median Earnings by Major Category section compares.
 
-**Response**:
+**Response**: it is much easier to read in the table than on this abomination of a boxplot graph
 
 
 <img src="README-img/noun_pause.png" alt="pause" width = "20"/> <b>Planned Pause Point</b>: If you feel that you have a good understanding of these commands, feel free to start working on your project. The remainder of this activity will help to expand these commands.
@@ -165,6 +196,13 @@ Here we will develop a series of rankings to see how the `major_category` levels
   - Assign/create a *rank* for each summarized value (rank for `total`, rank for `sharewomen`, etc.) and provide a meaningful name to each ranked column value. This ranking function might be confusing. Read the help documentation and ask for clarification. 
   - Arrange the results so that `major_category` appear in alphabetical order ("A" at the top).
 
+```{r category_rankings}
+college_recent_grads %>% 
+  group_by(major_category) %>% 
+  summarize(total_graduates = sum (total), median_share_women = median(sharewomen), median_unemployment_rate = median(unemployment_rate), median_income = median(median)) %>% 
+  arrange(major_category) %>% 
+  knitr::kable()
+```
 
 
 Provide a discussion on how the `major_category` rankings compare.
